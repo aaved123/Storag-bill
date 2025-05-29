@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Updated Billing System</title>
+</head>
+<body>
+  <!-- Your current billing UI code will be here -->  <script>
+    const STORAGE_KEY = 'billingData';
+
+    // Load data from localStorage when page loads
+    window.onload = () => {
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        const items = JSON.parse(storedData);
+        items.forEach(item => addRowFromStorage(item));
+        updateTotal();
+      }
+    };
+
+    // Save data to localStorage
+    function saveDataToStorage() {
+      const rows = document.querySelectorAll('#billTable tr');
+      const data = Array.from(rows).map(row => {
+        const cells = row.querySelectorAll('td');
+        return {
+          date: cells[0].innerText,
+          description: cells[1].innerText,
+          size: cells[2].innerText,
+          qty: cells[3].innerText,
+          rate: cells[4].innerText,
+          amount: cells[5].innerText
+        };
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // Add row normally + save after
+    function addRow() {
+      // your current addRow() logic
+      saveDataToStorage();
+    }
+
+    // Add row directly from stored data
+    function addRowFromStorage(item) {
+      const table = document.getElementById('billTable');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.date}</td>
+        <td>${item.description}</td>
+        <td>${item.size}</td>
+        <td>${item.qty}</td>
+        <td>${item.rate}</td>
+        <td>${item.amount}</td>
+        <td><button onclick="this.parentElement.parentElement.remove(); saveDataToStorage();">❌</button></td>
+      `;
+      table.appendChild(row);
+    }
+
+    // Update total
+    function updateTotal() {
+      let total = 0;
+      document.querySelectorAll('#billTable tr').forEach(row => {
+        const amount = parseFloat(row.cells[5].innerText) || 0;
+        total += amount;
+      });
+      document.getElementById('total').innerText = total.toFixed(2);
+    }
+  </script></body>
+</html>
